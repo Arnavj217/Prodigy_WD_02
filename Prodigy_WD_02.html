@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stopwatch</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      height: 100vh;
+      background: linear-gradient(to right, #e0c3fc, #8ec5fc);
+      font-family: 'Segoe UI', sans-serif;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      color: #6c5ce7;
+    }
+
+    #display {
+      font-size: 2.5em;
+      margin: 20px 0 30px;
+      color: #333;
+      font-weight: bold;
+    }
+
+    .buttons button {
+      font-size: 1em;
+      padding: 12px 20px;
+      margin: 8px 5px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      background-color: #6c5ce7;
+      color: white;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .buttons button:hover {
+      background-color: #5843c4;
+      transform: scale(1.05);
+    }
+
+    #laps {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+      text-align: left;
+      max-height: 150px;
+      overflow-y: auto;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+    }
+
+    #laps li {
+      margin: 8px 0;
+      padding: 10px 14px;
+      background: linear-gradient(to right, #dfe9f3, #ffffff);
+      border-left: 4px solid #6c5ce7;
+      border-radius: 8px;
+      font-size: 1em;
+      color: #333;
+      font-weight: 500;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    #laps::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #laps::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Stopwatch</h1>
+    <div id="display">00:00:00.00</div>
+    <div class="buttons">
+      <button onclick="startStop()">Start</button>
+      <button onclick="pause()">Pause</button>
+      <button onclick="reset()">Reset</button>
+      <button onclick="lap()">Lap</button>
+    </div>
+    <ul id="laps"></ul>
+  </div>
+
+  <script>
+    let startTime = 0;
+    let elapsedTime = 0;
+    let interval;
+    let isRunning = false;
+    let lapCounter = 1;
+
+    function timeToString(time) {
+      let hrs = Math.floor(time / 3600000);
+      let mins = Math.floor((time % 3600000) / 60000);
+      let secs = Math.floor((time % 60000) / 1000);
+      let ms = Math.floor((time % 1000) / 10); // 2 digits
+
+      return `${hrs.toString().padStart(2, '0')}:` +
+             `${mins.toString().padStart(2, '0')}:` +
+             `${secs.toString().padStart(2, '0')}.` +
+             `${ms.toString().padStart(2, '0')}`;
+    }
+
+    function print(txt) {
+      document.getElementById("display").innerText = txt;
+    }
+
+    function startStop() {
+      if (!isRunning) {
+        startTime = Date.now() - elapsedTime;
+        interval = setInterval(() => {
+          elapsedTime = Date.now() - startTime;
+          print(timeToString(elapsedTime));
+        }, 10);
+        isRunning = true;
+      }
+    }
+
+    function pause() {
+      if (isRunning) {
+        clearInterval(interval);
+        isRunning = false;
+      }
+    }
+
+    function reset() {
+      clearInterval(interval);
+      elapsedTime = 0;
+      isRunning = false;
+      lapCounter = 1;
+      print("00:00:00.00");
+      document.getElementById("laps").innerHTML = "";
+    }
+
+    function lap() {
+      if (isRunning) {
+        const lapTime = timeToString(elapsedTime);
+        const li = document.createElement("li");
+        li.textContent = `Lap ${lapCounter++} - ${lapTime}`;
+        document.getElementById("laps").appendChild(li);
+      }
+    }
+  </script>
+</body>
+</html>
